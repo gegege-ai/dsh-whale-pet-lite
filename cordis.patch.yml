@@ -1,0 +1,7 @@
+# 小鲸鱼桌宠 · cordis 挂载声明（原创 · MIT · gegege-ai）
+# 用法：把本文件里的 insert 条目合并进
+#   <DSH_HOME>/profiles/web/cordis.patch.yml
+# 然后重启引擎。
+- insert:
+    - id: whale-pet-host
+      name: dsh-whale-pet-lite
