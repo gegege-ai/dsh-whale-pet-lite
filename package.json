@@ -1,0 +1,23 @@
+{
+  "name": "dsh-whale-pet-lite",
+  "version": "0.1.0",
+  "private": true,
+  "description": "小鲸鱼桌宠（原创精简版）：右下角一只会呼吸/眨眼/跟着鼠标看/点一下冒泡泡的鲸鱼，可拖动，支持 idle/thinking/working/waiting/error 状态。纯内联 SVG + CSS + 原生 JS，无第三方素材。",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": { "default": "./lib/index.js" },
+    "./client": "./client/client.js",
+    "./package.json": "./package.json"
+  },
+  "files": ["lib/index.js", "client/client.js", "demo", "README.md", "LICENSE"],
+  "dsh": {
+    "client": {
+      "inject": ["@deepseek-ai/dsh-client-ui-settings"],
+      "platform": "web"
+    }
+  },
+  "keywords": ["dsh", "plugin", "pet", "whale", "svg"],
+  "license": "MIT",
+  "author": "gegege-ai"
+}
