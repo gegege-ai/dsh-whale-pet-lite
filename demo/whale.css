@@ -1,0 +1,247 @@
+/* 小鲸鱼桌宠 · 原创样式（MIT · gegege-ai）
+ * 纯 CSS 动画（transform / opacity），不使用 filter / box-shadow 动画，省 GPU。
+ * 容器固定定位；只有鲸鱼本体可点（pointer-events 只在 .whale 上）。
+ */
+
+.whale-pet,
+.whale-pet * {
+  box-sizing: border-box;
+}
+
+.whale-pet {
+  --whale-accent: #7cc4ff;
+  --whale-bubble: #bfe6ff;
+  position: fixed;
+  z-index: 2147482000;
+  width: 148px;
+  height: 197px;
+  left: auto;
+  top: auto;
+  right: 26px;
+  bottom: 20px;
+  display: block;
+  pointer-events: none;               /* 只有鲸鱼本体接收鼠标 */
+  transform: translate3d(0, 0, 0);
+  transition: opacity .18s ease;
+  will-change: transform;
+  font: 12px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+  color: #e8f4ff;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+.whale-pet[data-hidden="1"] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 鲸鱼本体：呼吸 + 跟随视线的轻微倾斜 */
+.whale-pet .whale {
+  position: absolute;
+  inset: 0;
+  pointer-events: auto;
+  cursor: grab;
+  transform-origin: 60% 80%;
+  animation: whale-breathe 3.4s ease-in-out infinite;
+  transition: transform .12s ease-out;
+}
+
+.whale-pet .whale.dragging {
+  cursor: grabbing;
+  animation-play-state: paused;
+}
+
+.whale-pet[data-hidden="1"] .whale {
+  pointer-events: none;
+}
+
+/* 跳一下 */
+.whale-pet .whale.jump {
+  animation: whale-jump .62s cubic-bezier(.2, .7, .3, 1);
+}
+
+/* 被拖住时轻微放大，给点手感 */
+.whale-pet .whale.dragging .whale-body {
+  transform: scale(1.03);
+}
+
+.whale-pet .whale-body {
+  transform-origin: 50% 60%;
+  transition: transform .18s ease;
+}
+
+.whale-pet svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* 眨眼：缩眼白高度（transform 比改 d 便宜） */
+.whale-pet .eye-lid {
+  transform-origin: center;
+  transform: scaleY(0);
+  transition: transform .06s ease;
+}
+
+.whale-pet .whale.blink .eye-lid {
+  transform: scaleY(1);
+}
+
+/* 眼睛跟随鼠标：瞳孔微移 */
+.whale-pet .pupil {
+  transition: transform .12s ease-out;
+}
+
+/* 状态徽标（头顶小图标） */
+.whale-pet .badge {
+  position: absolute;
+  top: 4px;
+  right: 14px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  line-height: 1;
+  background: #12263c;
+  border: 1px solid #2f5c86;
+  color: #cfe9ff;
+  animation: badge-pop .2s ease-out;
+}
+
+.whale-pet[data-state="thinking"] .badge,
+.whale-pet[data-state="working"] .badge,
+.whale-pet[data-state="waiting"] .badge,
+.whale-pet[data-state="error"] .badge {
+  display: flex;
+}
+
+.whale-pet[data-state="thinking"] .badge {
+  background: #10243a;
+  border-color: #3d7bb0;
+  animation: badge-pop .2s ease-out, thinking-spin 1.4s linear infinite;
+}
+
+.whale-pet[data-state="working"] .badge {
+  background: #102a3a;
+  border-color: #2f7f86;
+}
+
+.whale-pet[data-state="waiting"] .badge {
+  background: #2c2410;
+  border-color: #8a6f1e;
+  color: #ffd76a;
+}
+
+.whale-pet[data-state="error"] .badge {
+  background: #2c1214;
+  border-color: #8a2b2b;
+  color: #ff9a9a;
+}
+
+/* 状态配色：鲸鱼整体色调微调（用 CSS 变量，不改 SVG 结构） */
+.whale-pet[data-state="thinking"] { --whale-accent: #8fd0ff; }
+.whale-pet[data-state="working"] { --whale-accent: #7fe3d4; }
+.whale-pet[data-state="waiting"] { --whale-accent: #ffd76a; }
+.whale-pet[data-state="error"] { --whale-accent: #ff9a9a; }
+
+/* 泡泡 */
+.whale-pet .bubbles {
+  position: absolute;
+  left: 50%;
+  top: 18px;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+.whale-pet .bubble {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 30%, #ffffff 0%, var(--whale-bubble) 45%, rgba(140, 200, 255, .25) 100%);
+  border: 1px solid rgba(200, 236, 255, .9);
+  box-shadow: 0 0 6px rgba(150, 215, 255, .55);
+  animation: bubble-rise 1.5s ease-out forwards;
+}
+
+.whale-pet .bubble:nth-child(2n) { width: 9px; height: 9px; animation-duration: 1.25s; }
+.whale-pet .bubble:nth-child(3n) { width: 16px; height: 16px; animation-duration: 1.7s; }
+
+/* 隐藏后右下角的小圆点（双击召回） */
+.whale-pet-dot {
+  position: fixed;
+  right: 22px;
+  bottom: 18px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #123048;
+  border: 1px solid #2f5c86;
+  opacity: .55;
+  z-index: 2147482000;
+  cursor: pointer;
+  transition: opacity .15s ease, transform .15s ease;
+}
+
+.whale-pet-dot:hover {
+  opacity: 1;
+  transform: scale(1.08);
+}
+
+.whale-pet-dot::after {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  background: #7cc4ff;
+}
+
+/* ---------- keyframes ---------- */
+@keyframes whale-breathe {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-5px) rotate(-.6deg); }
+}
+
+@keyframes whale-jump {
+  0% { transform: translateY(0) scale(1); }
+  28% { transform: translateY(-26px) scale(1.05, .96); }
+  55% { transform: translateY(-4px) scale(.98, 1.03); }
+  78% { transform: translateY(-9px) scale(1.01, .99); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+@keyframes bubble-rise {
+  0% { transform: translate3d(0, 6px, 0) scale(.4); opacity: 0; }
+  18% { opacity: 1; }
+  100% { transform: translate3d(var(--bx, 0px), -58px, 0) scale(1); opacity: 0; }
+}
+
+@keyframes badge-pop {
+  0% { transform: scale(.6); opacity: .4; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes thinking-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .whale-pet .whale { animation: none; }
+  .whale-pet .bubble { animation-duration: .01s; }
+}
+
+
+/* ===== 2026-10-30 换成"鲸鱼娘"角色（设计出图 a.svg）后的适配 ===== */
+.whale-pet .whale-body { overflow: visible; }
+.whale-pet .whale.blink #eyeL,
+.whale-pet .whale.blink #eyeR { transform: scaleY(.12); transform-box: fill-box; transform-origin: center; }
+.whale-pet .whale #eyeL, .whale-pet .whale #eyeR { transition: transform .11s ease; }
