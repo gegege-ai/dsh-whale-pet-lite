@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>小鲸鱼桌宠 · 原创 demo</title>
+<link rel="stylesheet" href="whale.css">
+<style>
+  :root { color-scheme: dark; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: radial-gradient(1200px 600px at 70% -10%, #16324d 0%, #0b1420 55%, #070d15 100%);
+    color: #dbe9f7;
+    font: 14px/1.7 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 0 6vw;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+  h1 { font-size: 22px; margin: 0 0 6px; font-weight: 700; letter-spacing: .3px; }
+  .sub { color: #7f97b0; font-size: 13px; margin-bottom: 18px; }
+  .card {
+    border: 1px solid #22384f;
+    background: rgba(12, 22, 34, .72);
+    border-radius: 14px;
+    padding: 14px 18px;
+    max-width: 560px;
+    box-shadow: 0 18px 46px rgba(0, 0, 0, .35);
+  }
+  ul { margin: 6px 0 0; padding-left: 18px; color: #a9bed3; font-size: 13px; }
+  li { margin: 2px 0; }
+  .states { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+  .states button {
+    appearance: none;
+    border: 1px solid #2b4a68;
+    background: #12263b;
+    color: #cfe6ff;
+    border-radius: 8px;
+    padding: 5px 11px;
+    font: 12px/1 inherit;
+    cursor: pointer;
+  }
+  .states button:hover { border-color: #4b8dc7; background: #17314c; }
+  .states button[data-active="1"] { border-color: #5aa7e8; background: #1b3e5f; color: #eaf6ff; }
+  code { background: #10202f; border: 1px solid #1e3348; border-radius: 5px; padding: 1px 5px; font-size: 12px; color: #9fd0ff; }
+</style>
+</head>
+<body>
+  <h1>小鲸鱼桌宠 · 原创 demo</h1>
+  <div class="sub">右下角那只鲸鱼：会呼吸、会眨眼、眼睛跟着鼠标、点一下跳起来冒泡泡、能拖着走（松手弹回底边）</div>
+
+  <div class="card">
+    <div>试试这些：</div>
+    <ul>
+      <li>把鼠标在屏幕上晃一晃 —— 眼睛和身体会朝光标方向偏</li>
+      <li>点一下鲸鱼 —— 跳一下，头顶冒 3~5 个泡泡</li>
+      <li>按住拖走再松手 —— 惯性滑行后回弹到底边，位置会记住</li>
+      <li><b>双击鲸鱼</b> —— 隐藏；双击右下角小圆点 —— 叫回来</li>
+      <li>下面的按钮切换状态（等价于 <code>whalePet.setState('working')</code>）</li>
+    </ul>
+    <div class="states" id="states"></div>
+  </div>
+
+  <script src="whale.js"></script>
+  <script>
+    // ?state=waiting / ?auto=click 供截图与自测用
+    var params = new URLSearchParams(location.search);
+    var pet = window.whalePet.mount({ state: params.get('state') || 'idle' });
+
+    var names = [['idle', '待机'], ['thinking', '思考'], ['working', '干活'], ['waiting', '等你'], ['error', '出错']];
+    var box = document.getElementById('states');
+    function paint(active) {
+      Array.prototype.forEach.call(box.children, function (b) {
+        b.setAttribute('data-active', b.dataset.state === active ? '1' : '0');
+      });
+    }
+    names.forEach(function (n) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = n[1];
+      b.dataset.state = n[0];
+      b.addEventListener('click', function () {
+        pet.setState(n[0]);
+        paint(n[0]);
+      });
+      box.appendChild(b);
+    });
+    paint(pet.getState());
+
+    if (params.get('auto') === 'click') {
+      setTimeout(function () { pet.jump(); }, 240);
+    }
+  </script>
+</body>
+</html>
